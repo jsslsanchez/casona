@@ -1,0 +1,92 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Guest {
+  identification  String    @id
+  documentType    String
+  firstName       String
+  lastName        String
+  email           String    @unique
+  phone           String
+  country         String?
+  hostingGuestId  String?   // Foreign key to main guest
+  hostingGuest    Guest?    @relation("GuestHosting", fields: [hostingGuestId], references: [identification])
+  hostedGuests    Guest[]   @relation("GuestHosting")
+  bookings        Booking[]
+
+  @@unique([identification, documentType]) // Composite unique key for identification and document type
+  @@map("Guest")
+}
+
+model Booking {
+  id              Int      @id @default(autoincrement())
+  checkIn         DateTime
+  checkOut        DateTime
+  status          String
+  numGuests       Int
+  totalAmount     Float
+  paymentStatus   String
+  paymentIntentId String?
+  guestId         String
+  roomNumber      String
+  guest           Guest    @relation(fields: [guestId], references: [identification])
+  room            Room     @relation(fields: [roomNumber], references: [roomNumber])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("Booking")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String
+  message   String
+  status    String
+  date      DateTime
+  details   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Notification")
+}
+
+model Room {
+  roomNumber     String      @id
+  roomType       String
+  description    String?
+  pricePerNight  Int
+  capacity       Int
+  size           Int
+  features       String
+  bookings       Booking[]
+  images         RoomImage[]
+
+  @@map("Room")
+}
+
+model RoomImage {
+  id           Int    @id @default(autoincrement())
+  url          String
+  displayOrder Int
+  roomNumber   String
+  room         Room   @relation(fields: [roomNumber], references: [roomNumber])
+
+  @@map("RoomImage")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  registryDate DateTime @default(now())
+
+  @@map("Administrator")
+}

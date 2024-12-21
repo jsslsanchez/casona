@@ -1,0 +1,160 @@
+{
+  "uuid": "b1ee7942-2e7f-4f10-b6ee-85e40b020272",
+  "lastMigration": 33,
+  "name": "Payment gateway",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3002,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "a894d320-f20c-4670-b25e-e3057c5cee6c",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "/",
+      "responses": [
+        {
+          "uuid": "ba20d143-994d-4ec7-8919-b03f447f4593",
+          "body": "{}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null,
+      "streamingMode": null,
+      "streamingInterval": 0
+    },
+    {
+      "uuid": "c2f9b7d8-8e3b-4b6e-a7df-2d9b2e0c3e2f",
+      "type": "http",
+      "documentation": "",
+      "method": "post",
+      "endpoint": "/api/payments",
+      "responses": [
+        {
+          "uuid": "d3e9c4a1-5f8d-4b2e-9c3a-4f8e9a2b3c4d",
+          "body": "{\n  \"status\": \"success\",\n  \"transactionId\": \"txn_{{randomNumber min=100000 max=999999}}\"\n}",
+          "latency": 1000,
+          "statusCode": 200,
+          "label": "Successful Payment",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "field": "body.cardNumber",
+              "value": "^4\\d{12}(?:\\d{3})?$",
+              "operator": "MATCHES"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "e4f0d5b2-6g9h-5c3d-8e4f-5g9h0i1j2k3l",
+          "body": "{\n  \"error\": \"Payment was declined. Please try another card.\"\n}",
+          "latency": 1000,
+          "statusCode": 402,
+          "label": "Payment Declined",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "field": "body.cardNumber",
+              "value": "^4\\d{12}(?:\\d{3})?$",
+              "operator": "NOT_MATCHES"
+            }
+          ],
+          "rulesOperator": "AND",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": "FIRST_MATCH",
+      "streamingMode": null,
+      "streamingInterval": 0
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "a894d320-f20c-4670-b25e-e3057c5cee6c"
+    },
+    {
+      "type": "route",
+      "uuid": "c2f9b7d8-8e3b-4b6e-a7df-2d9b2e0c3e2f"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [],
+  "proxyResHeaders": [],
+  "data": [],
+  "callbacks": []
+}
